@@ -15,7 +15,7 @@ function priceIdForPlan(plan: "student" | "pro") {
 }
 
 export async function POST(request: Request) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -71,4 +71,3 @@ export async function POST(request: Request) {
   if (!session.url) return NextResponse.json({ error: "Stripe session missing URL" }, { status: 500 });
   return NextResponse.json({ url: session.url });
 }
-

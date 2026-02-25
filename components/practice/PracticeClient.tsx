@@ -2,11 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MathMarkdown } from "@/components/math/MathMarkdown";
+import { Badge } from "@/components/ui/badge";
 
 type Difficulty = "easy" | "medium" | "hard";
 
@@ -59,11 +61,21 @@ export function PracticeClient() {
 
   return (
     <div className="container py-10">
-      <h1 className="text-2xl font-semibold tracking-tight">Practice</h1>
-      <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-        Generate exam-style practice problems by topic and difficulty, aligned to your course notes. Then solve with the
-        hint ladder.
-      </p>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Practice</h1>
+          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
+            Generate exam-style practice problems by topic and difficulty, aligned to your course notes. Then solve with
+            the hint ladder.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Badge className="gap-2">
+            <Sparkles className="h-3.5 w-3.5" />
+            Exam Practice
+          </Badge>
+        </div>
+      </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <Card className="p-6 lg:col-span-1">
@@ -72,7 +84,7 @@ export function PracticeClient() {
             <div className="space-y-1">
               <Label>Course</Label>
               <select
-                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+                className="h-10 w-full rounded-md border bg-background px-3 text-sm shadow-sm focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 value={courseId}
                 onChange={(e) => setCourseId(e.target.value)}
               >
@@ -93,7 +105,7 @@ export function PracticeClient() {
             <div className="space-y-1">
               <Label>Difficulty</Label>
               <select
-                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+                className="h-10 w-full rounded-md border bg-background px-3 text-sm shadow-sm focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value as Difficulty)}
               >
@@ -103,13 +115,13 @@ export function PracticeClient() {
               </select>
             </div>
 
-            <Button onClick={generate} disabled={loading}>
+            <Button onClick={generate} size="lg" disabled={loading}>
               {loading ? "Generating…" : "Generate problem"}
             </Button>
 
-            {error ? <div className="text-sm text-red-700">{error}</div> : null}
+            {error ? <div className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-red-700">{error}</div> : null}
 
-            <div className="rounded-lg border border-border bg-muted p-3 text-xs text-muted-foreground">
+            <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
               Integrity-first: this generator won’t dump full worked solutions by default. Use the hint ladder in chat.
             </div>
           </div>
@@ -153,4 +165,3 @@ export function PracticeClient() {
     </div>
   );
 }
-

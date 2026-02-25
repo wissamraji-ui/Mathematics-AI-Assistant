@@ -7,7 +7,7 @@ async function isAdmin() {
   const user = await getCurrentUser();
   if (!user) return false;
 
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data } = await supabase.from("users").select("role").eq("id", user.id).maybeSingle();
   return data?.role === "admin";
 }
@@ -33,4 +33,3 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return <div>{children}</div>;
 }
-

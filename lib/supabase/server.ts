@@ -3,19 +3,27 @@ import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getRequiredEnv } from "@/lib/env";
 
-export function createSupabaseServerClient() {
-  const cookieStore = cookies();
+export async function createSupabaseServerClient() {
+  const cookieStore = await cookies();
 
   return createServerClient(getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"), getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"), {
     cookies: {
-      get(name) {
+      get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      set(name, value, options) {
-        cookieStore.set({ name, value, ...options });
+      set(name: string, value: string, options: any) {
+        try {
+          (cookieStore as any).set({ name, value, ...options });
+        } catch {
+          // Server Components may not allow setting cookies. Ignore and rely on middleware/route handlers when needed.
+        }
       },
-      remove(name, options) {
-        cookieStore.set({ name, value: "", ...options, maxAge: 0 });
+      remove(name: string, options: any) {
+        try {
+          (cookieStore as any).set({ name, value: "", ...options, maxAge: 0 });
+        } catch {
+          // ignore (see set)
+        }
       },
     },
   });

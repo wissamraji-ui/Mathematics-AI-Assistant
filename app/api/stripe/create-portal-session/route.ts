@@ -5,7 +5,7 @@ import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/s
 export const runtime = "nodejs";
 
 export async function POST() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,4 +26,3 @@ export async function POST() {
 
   return NextResponse.json({ url: session.url });
 }
-

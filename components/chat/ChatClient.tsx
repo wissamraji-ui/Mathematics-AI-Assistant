@@ -2,12 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MathMarkdown } from "@/components/math/MathMarkdown";
+import { Badge } from "@/components/ui/badge";
 
 type ChatMode = "tutor" | "proof-trainer" | "exam";
 type RigorLevel = "intro" | "intermediate" | "honors" | "graduate";
@@ -123,176 +125,209 @@ export function ChatClient() {
   }
 
   return (
-    <div className="container py-8">
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="lg:w-80">
-          <Card className="p-5">
-            <div className="text-sm font-medium">Session</div>
-            <div className="mt-4 space-y-4">
-              <div className="space-y-1">
-                <Label>Course</Label>
-                <select
-                  className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-                  value={courseId}
-                  onChange={(e) => setCourseId(e.target.value)}
-                >
-                  <option value="real-analysis-1">Real Analysis I</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <Label>Mode</Label>
-                <select
-                  className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-                  value={mode}
-                  onChange={(e) => setMode(e.target.value as ChatMode)}
-                >
-                  <option value="tutor">Tutor</option>
-                  <option value="proof-trainer">Proof Trainer</option>
-                  <option value="exam">Exam Practice</option>
-                </select>
-                <div className="mt-2 text-xs text-muted-foreground">
-                  {mode === "tutor"
-                    ? "Tutor Mode: hints + Socratic prompts."
-                    : mode === "proof-trainer"
-                      ? "Proof Trainer: checks proof structure and suggests the next lemma/step."
-                      : "Exam Practice: generate practice problems by topic/difficulty and get hint-based help."}
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <Label>Rigor</Label>
-                <select
-                  className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-                  value={rigor}
-                  onChange={(e) => setRigor(e.target.value as RigorLevel)}
-                >
-                  <option value="intro">Intro</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="honors">Honors</option>
-                  <option value="graduate">Graduate</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <Label>My attempt (optional)</Label>
-                <Textarea
-                  value={attempt}
-                  onChange={(e) => setAttempt(e.target.value)}
-                  placeholder="Write your proof attempt or partial work to unlock better guidance."
-                  rows={6}
-                />
-              </div>
-
-              <div className="rounded-lg border border-border bg-muted p-3 text-xs text-muted-foreground">
-                Hint ladder is integrity-first: you’ll start with small hints. Full solutions may require a written
-                attempt or a higher tier.
-              </div>
-            </div>
-          </Card>
+    <div className="container py-10">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Chat</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Ask a proof question and climb the hint ladder.</p>
         </div>
+        <div className="flex flex-wrap gap-2">
+          <Badge className="gap-2">
+            <Sparkles className="h-3.5 w-3.5" />
+            {mode === "tutor" ? "Tutor Mode" : mode === "proof-trainer" ? "Proof Trainer" : "Exam Practice"}
+          </Badge>
+          <Badge>Rigor: {rigor}</Badge>
+        </div>
+      </div>
 
-        <div className="flex-1 space-y-4">
-          <Card className="p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <div className="flex-1">
-                <Label htmlFor="prompt">Ask a question</Label>
-                <Input
-                  id="prompt"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="e.g., Prove that every Cauchy sequence in ℝ converges."
-                />
-              </div>
-              <div className="flex flex-wrap gap-2 pt-6 sm:pt-0">
-                <Button
-                  disabled={loading || !input.trim()}
-                  onClick={() => runTurn(input.trim(), 1)}
-                  title="Give me a small hint"
-                >
-                  Give me a small hint
-                </Button>
-                <Button
-                  disabled={loading || !input.trim()}
-                  variant="secondary"
-                  onClick={() => runTurn(input.trim(), 2)}
-                  title="Give me a bigger hint"
-                >
-                  Give me a bigger hint
-                </Button>
-                <Button
-                  disabled={loading || !input.trim()}
-                  variant="secondary"
-                  onClick={() => runTurn(input.trim(), 3)}
-                  title="Show proof outline"
-                >
-                  Show proof outline
-                </Button>
-                <Button
-                  disabled={loading || !input.trim()}
-                  variant="secondary"
-                  onClick={() => runTurn(input.trim(), 4)}
-                  title="Show full solution (if allowed)"
-                >
-                  Show full solution (if allowed)
-                </Button>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[360px_1fr]">
+        <Card className="p-6">
+          <div className="text-sm font-medium">Session</div>
+          <div className="mt-4 space-y-4">
+            <div className="space-y-1">
+              <Label>Course</Label>
+              <select
+                className="h-10 w-full rounded-md border bg-background px-3 text-sm shadow-sm focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                value={courseId}
+                onChange={(e) => setCourseId(e.target.value)}
+              >
+                <option value="real-analysis-1">Real Analysis I</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <Label>Mode</Label>
+              <select
+                className="h-10 w-full rounded-md border bg-background px-3 text-sm shadow-sm focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                value={mode}
+                onChange={(e) => setMode(e.target.value as ChatMode)}
+              >
+                <option value="tutor">Tutor</option>
+                <option value="proof-trainer">Proof Trainer</option>
+                <option value="exam">Exam Practice</option>
+              </select>
+              <div className="mt-2 text-xs text-muted-foreground">
+                {mode === "tutor"
+                  ? "Tutor Mode: hints + Socratic prompts."
+                  : mode === "proof-trainer"
+                    ? "Proof Trainer: structure checks + next lemma."
+                    : "Exam Practice: generate practice problems by topic/difficulty."}
               </div>
             </div>
 
-            {error ? <div className="mt-4 rounded-md border border-border bg-muted px-3 py-2 text-sm text-red-700">{error}</div> : null}
-          </Card>
+            <div className="space-y-1">
+              <Label>Rigor</Label>
+              <select
+                className="h-10 w-full rounded-md border bg-background px-3 text-sm shadow-sm focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                value={rigor}
+                onChange={(e) => setRigor(e.target.value as RigorLevel)}
+              >
+                <option value="intro">Intro</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="honors">Honors</option>
+                <option value="graduate">Graduate</option>
+              </select>
+            </div>
 
-          <div className="space-y-4">
+            <div className="space-y-1">
+              <Label>My attempt (optional)</Label>
+              <Textarea
+                value={attempt}
+                onChange={(e) => setAttempt(e.target.value)}
+                placeholder="Paste your proof attempt (even partial) for targeted feedback."
+                rows={7}
+              />
+            </div>
+
+            <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
+              Hint ladder is integrity-first: start with small hints. Full solutions may require an attempt or Pro.
+            </div>
+          </div>
+        </Card>
+
+        <Card className="flex min-h-[70vh] flex-col overflow-hidden">
+          <div className="border-b bg-muted/30 px-5 py-3 text-sm">
+            <span className="font-medium">Hint ladder</span>{" "}
+            <span className="text-muted-foreground">— choose how much help you want.</span>
+          </div>
+
+          <div className="flex-1 space-y-4 overflow-auto p-5">
             {turns.length === 0 ? (
-              <Card className="p-8">
-                <div className="text-sm text-muted-foreground">
-                  Ask a proof question to begin. Use the hint buttons to control how much help you get.
+              <div className="rounded-xl border bg-background p-6">
+                <div className="text-sm font-medium">Start here</div>
+                <div className="mt-2 text-sm text-muted-foreground">
+                  Type a proof question, then click “Give me a small hint”.
                 </div>
-              </Card>
+                <div className="mt-4 text-xs text-muted-foreground">
+                  Tip: paste your attempt to unlock stronger guidance responsibly.
+                </div>
+              </div>
             ) : null}
 
             {turns.map((turn) => (
-              <Card key={turn.id} className="p-5">
-                <div className="text-sm text-muted-foreground">You</div>
-                <div className="mt-1 text-sm">{turn.question}</div>
-
-                <div className="mt-5 text-sm text-muted-foreground">Assistant</div>
-                <div className="mt-2">
-                  {turn.answer ? <MathMarkdown content={turn.answer} /> : <div className="text-sm text-muted-foreground">…</div>}
+              <div key={turn.id} className="space-y-3">
+                <div className="flex justify-end">
+                  <div className="max-w-[85%] rounded-2xl bg-primary px-4 py-3 text-sm text-primary-foreground shadow-sm">
+                    <div className="text-xs opacity-80">You</div>
+                    <div className="mt-1 whitespace-pre-wrap">{turn.question}</div>
+                  </div>
                 </div>
 
-                {turn.citations.length ? (
-                  <div className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-                    <div className="font-medium text-foreground">Citations</div>
-                    <ul className="mt-2 space-y-1">
-                      {turn.citations.map((c) => (
-                        <li key={c.chunkId}>
-                          {c.documentTitle ? `${c.documentTitle}` : "Notes"} {c.section ? `· ${c.section}` : ""}{" "}
-                          {typeof c.page === "number" ? `· p.${c.page}` : ""}{" "}
-                          {typeof c.similarity === "number" ? `· sim ${c.similarity.toFixed(3)}` : ""}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
+                <div className="flex justify-start">
+                  <div className="max-w-[85%] rounded-2xl bg-muted/60 px-4 py-3 text-sm shadow-sm">
+                    <div className="text-xs text-muted-foreground">Assistant</div>
+                    <div className="mt-2">
+                      {turn.answer ? (
+                        <MathMarkdown content={turn.answer} />
+                      ) : (
+                        <div className="text-sm text-muted-foreground">…</div>
+                      )}
+                    </div>
 
-                {turn === lastTurn ? (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      disabled={loading || turn.hintLevel >= 4}
-                      onClick={() => runTurn(turn.question, clampHintLevel(turn.hintLevel + 1), turn.id)}
-                    >
-                      Next rung
-                    </Button>
-                    <div className="text-xs text-muted-foreground self-center">Current rung: {turn.hintLevel}/4</div>
+                    {turn.citations.length ? (
+                      <div className="mt-4 border-t pt-3 text-xs text-muted-foreground">
+                        <div className="font-medium text-foreground">Citations</div>
+                        <ul className="mt-2 list-disc space-y-1 pl-5">
+                          {turn.citations.map((c) => (
+                            <li key={c.chunkId}>
+                              {c.documentTitle ? `${c.documentTitle}` : "Notes"} {c.section ? `· ${c.section}` : ""}{" "}
+                              {typeof c.page === "number" ? `· p.${c.page}` : ""}{" "}
+                              {typeof c.similarity === "number" ? `· sim ${c.similarity.toFixed(3)}` : ""}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+
+                    {turn === lastTurn ? (
+                      <div className="mt-4 flex flex-wrap items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          disabled={loading || turn.hintLevel >= 4}
+                          onClick={() => runTurn(turn.question, clampHintLevel(turn.hintLevel + 1), turn.id)}
+                        >
+                          Next rung
+                        </Button>
+                        <div className="text-xs text-muted-foreground">Current rung: {turn.hintLevel}/4</div>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
-        </div>
+
+          <div className="border-t bg-background p-5">
+            <div className="space-y-2">
+              <Label htmlFor="prompt">Ask a question</Label>
+              <Input
+                id="prompt"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="e.g., Prove that every Cauchy sequence in ℝ converges."
+              />
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button disabled={loading || !input.trim()} onClick={() => runTurn(input.trim(), 1)} title="Give me a small hint">
+                <span className="hidden sm:inline">Give me a small hint</span>
+                <span className="sm:hidden">Small hint</span>
+              </Button>
+              <Button
+                disabled={loading || !input.trim()}
+                variant="secondary"
+                onClick={() => runTurn(input.trim(), 2)}
+                title="Give me a bigger hint"
+              >
+                <span className="hidden sm:inline">Give me a bigger hint</span>
+                <span className="sm:hidden">Bigger hint</span>
+              </Button>
+              <Button
+                disabled={loading || !input.trim()}
+                variant="secondary"
+                onClick={() => runTurn(input.trim(), 3)}
+                title="Show proof outline"
+              >
+                <span className="hidden sm:inline">Show proof outline</span>
+                <span className="sm:hidden">Outline</span>
+              </Button>
+              <Button
+                disabled={loading || !input.trim()}
+                variant="secondary"
+                onClick={() => runTurn(input.trim(), 4)}
+                title="Show full solution (if allowed)"
+              >
+                <span className="hidden sm:inline">Show full solution (if allowed)</span>
+                <span className="sm:hidden">Full</span>
+              </Button>
+            </div>
+
+            {error ? (
+              <div className="mt-3 rounded-md border bg-muted/40 px-3 py-2 text-sm text-red-700">{error}</div>
+            ) : null}
+          </div>
+        </Card>
       </div>
     </div>
   );
